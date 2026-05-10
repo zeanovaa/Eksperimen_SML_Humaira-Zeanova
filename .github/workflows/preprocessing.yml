@@ -1,1 +1,58 @@
+name: Automated Preprocessing Pipeline
 
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  preprocessing:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Run actions/checkout@v3
+        uses: actions/checkout@v3
+
+      - name: Set up Python 3.12.7
+        uses: actions/setup-python@v4
+        with:
+          python-version: "3.12.7"
+
+      - name: Check Env
+        run: |
+          python --version
+          pip --version
+          echo "Working directory: $(pwd)"
+          echo "Files tersedia:"
+          ls -la
+
+      - name: Install dependencies
+        run: |
+          pip install pandas numpy scikit-learn
+
+      - name: Run preprocessing script
+        run: |
+          python preprocessing/automate_Humaira-Zeanova.py
+
+      - name: Verify output
+        run: |
+          echo "=== Hasil preprocessing ==="
+          ls -lh preprocessing/stroke_preprocessing.csv
+          python -c "
+          import pandas as pd
+          df = pd.read_csv('preprocessing/stroke_preprocessing.csv')
+          print(f'Shape  : {df.shape}')
+          print(f'Columns: {df.columns.tolist()}')
+          print(f'NaN    : {df.isnull().sum().sum()}')
+          "
+
+      - name: Commit and push preprocessed dataset
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git add preprocessing/stroke_preprocessing.csv
+          git diff --staged --quiet || git commit -m "ci: update stroke_preprocessing.csv [skip ci]"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
