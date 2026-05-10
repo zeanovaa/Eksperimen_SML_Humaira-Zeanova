@@ -222,7 +222,7 @@ def preprocess(input_path: str, output_path: str) -> pd.DataFrame:
 
 
 if __name__ == "__main__":
-    INPUT_PATH  = "../healthcare-dataset-stroke-data.csv"
-    OUTPUT_PATH = "stroke_preprocessing.csv"
+    INPUT_PATH  = "healthcare-dataset-stroke-data.csv"   
+    OUTPUT_PATH = "preprocessing/stroke_preprocessing.csv"  
 
     df_result = preprocess(INPUT_PATH, OUTPUT_PATH)
